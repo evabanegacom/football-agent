@@ -85,14 +85,15 @@ function calcAge(dob: string): number {
 }
 
 // Helper to display DOB nicely
-function formatDob(dob: string): string {
-  const m = dob.match(/Date\((\d+),(\d+),(\d+)\)/);
+function formatDob(raw: string): string {
+  // matches both Date(Y,M,D) and Date(Y,M,D,h,m,s)
+  const m = raw.match(/Date\((\d+),(\d+),(\d+)/);
   if (m) {
     return new Date(Number(m[1]), Number(m[2]), Number(m[3]))
       .toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
   }
-  const d = new Date(dob);
-  return isNaN(d.getTime()) ? dob : d.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? raw : d.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
 }
 
 function parseSheetData(raw: string): Prospect[] {
@@ -227,7 +228,8 @@ const ProspectModal = ({ prospect, onClose }: { prospect: Prospect; onClose: () 
             <Avatar prospect={prospect} size="lg" />
             <div className="flex-1 min-w-0">
               <p className="text-emerald-400 text-xs font-semibold tracking-widest uppercase mb-1">
-#{String(Number(prospect.id) + 1).padStart(3, "0")} · Registered {prospect.timestamp ? formatDob(prospect.timestamp) : "—"}              </p>
+#{String(Number(prospect.id) + 1).padStart(3, "0")} · Registered {prospect.timestamp || "—"}
+     </p>
               <h2 className="text-white font-black text-2xl leading-tight truncate">{prospect.fullName}</h2>
               <div className="mt-1"><PositionBadge position={prospect.position} /></div>
             </div>
