@@ -211,7 +211,7 @@ const ProspectModal = ({ prospect, onClose }: { prospect: Prospect; onClose: () 
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
         transition={{ type: "spring", stiffness: 260, damping: 22 }}
-        onClick={(e) => e.stopPropagation()}
+        // onClick={(e) => e.stopPropagation()}
         className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-white/10 shadow-2xl"
         style={{ background: "rgba(4,30,48,0.98)" }}
       >
@@ -221,7 +221,7 @@ const ProspectModal = ({ prospect, onClose }: { prospect: Prospect; onClose: () 
           <div className="absolute inset-0 opacity-20"
             style={{ backgroundImage: "repeating-linear-gradient(0deg,transparent,transparent 20px,#22c55e 20px,#22c55e 21px)" }} />
           <button onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 transition-all">
+            className="absolute cursor-pointer top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 transition-all">
             ✕
           </button>
           <div className="absolute bottom-0 left-0 right-0 p-6 flex items-end gap-4">

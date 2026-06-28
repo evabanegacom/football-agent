@@ -1,6 +1,5 @@
 import { useState, useRef, type ChangeEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import ProspectsDashboard from "./prospects";
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────────
 const GOOGLE_SCRIPT_URL =
@@ -835,7 +834,6 @@ export default function FootballAcademyRegistration() {
           </AnimatePresence>
         </motion.div>
       </div>
-      <ProspectsDashboard />
     </div>
   );
 }
