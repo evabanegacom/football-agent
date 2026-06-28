@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
@@ -530,6 +531,12 @@ export default function ProspectsDashboard() {
                 PROSPECTS <span style={{ color: "#4ade80" }}>DATABASE</span>
               </h1>
             </div>
+            <Link
+              to="/register"
+              className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-500/25 whitespace-nowrap"
+            >
+              + Add Prospect
+            </Link>
             {/* Stat pills */}
             {!loading && (
               <div className="hidden sm:flex items-center gap-3 flex-wrap justify-end">
