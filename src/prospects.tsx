@@ -64,12 +64,35 @@ const POSITION_SHORT: Record<string, string> = {
 
 function calcAge(dob: string): number {
   if (!dob) return 0;
-  const birth = new Date(dob);
+
+  let birth: Date;
+
+  // gviz returns dates as "Date(YYYY,M,D)" where month is 0-indexed
+  const m = dob.match(/Date\((\d+),(\d+),(\d+)\)/);
+  if (m) {
+    birth = new Date(Number(m[1]), Number(m[2]), Number(m[3]));
+  } else {
+    birth = new Date(dob); // fallback for ISO strings
+  }
+
+  if (isNaN(birth.getTime())) return 0;
+
   const now = new Date();
   let age = now.getFullYear() - birth.getFullYear();
-  const m = now.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
-  return age;
+  const diff = now.getMonth() - birth.getMonth();
+  if (diff < 0 || (diff === 0 && now.getDate() < birth.getDate())) age--;
+  return age < 0 ? 0 : age;
+}
+
+// Helper to display DOB nicely
+function formatDob(dob: string): string {
+  const m = dob.match(/Date\((\d+),(\d+),(\d+)\)/);
+  if (m) {
+    return new Date(Number(m[1]), Number(m[2]), Number(m[3]))
+      .toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
+  }
+  const d = new Date(dob);
+  return isNaN(d.getTime()) ? dob : d.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
 }
 
 function parseSheetData(raw: string): Prospect[] {
@@ -84,10 +107,15 @@ function parseSheetData(raw: string): Prospect[] {
       const firstName  = String(c(1));
       const middleName = String(c(2));
       const lastName   = String(c(3));
-      const dob        = String(c(4));
+      const dobRaw = r.c?.[4]?.v ?? "";
+const dob = String(dobRaw); // keeps "Date(2026,5,11)" format intact for calcAge
+console.log("dob raw:", dobRaw, "| parsed age:", calcAge(dob));
+const timestampRaw = String(r.c?.[0]?.v ?? "");
+
       return {
         id:             String(i),
-        timestamp:      String(c(0)),
+        timestamp:      formatDob(timestampRaw),   // ← format here at parse time
+
         firstName,
         middleName,
         lastName,
@@ -199,8 +227,7 @@ const ProspectModal = ({ prospect, onClose }: { prospect: Prospect; onClose: () 
             <Avatar prospect={prospect} size="lg" />
             <div className="flex-1 min-w-0">
               <p className="text-emerald-400 text-xs font-semibold tracking-widest uppercase mb-1">
-                #{String(Number(prospect.id) + 1).padStart(3, "0")} · Registered {prospect.timestamp ? new Date(prospect.timestamp).toLocaleDateString() : "—"}
-              </p>
+#{String(Number(prospect.id) + 1).padStart(3, "0")} · Registered {prospect.timestamp ? formatDob(prospect.timestamp) : "—"}              </p>
               <h2 className="text-white font-black text-2xl leading-tight truncate">{prospect.fullName}</h2>
               <div className="mt-1"><PositionBadge position={prospect.position} /></div>
             </div>
@@ -230,7 +257,7 @@ const ProspectModal = ({ prospect, onClose }: { prospect: Prospect; onClose: () 
               Personal
             </p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-              <Field label="Date of Birth" value={prospect.dob} />
+              <Field label="Date of Birth" value={formatDob(prospect.dob)} />
               <Field label="Gender" value={prospect.gender} />
               <Field label="Nationality" value={prospect.nationality} />
               <Field label="State of Origin" value={prospect.stateOfOrigin} />
