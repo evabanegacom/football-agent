@@ -6,8 +6,8 @@ const GOOGLE_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbzDJsDhzek_eDWzhIrdjCyBXQpO6nnd4Na2j6m3lAEGWM4-v5s6xcdNpzeCSCLxAkgA/exec";
 
 // Replace with your Cloudinary cloud name + an UNSIGNED upload preset
-const CLOUDINARY_CLOUD_NAME = "spetsnaz";
-const CLOUDINARY_UPLOAD_PRESET = "football-registration";
+const CLOUDINARY_CLOUD_NAME = "your_cloud_name";
+const CLOUDINARY_UPLOAD_PRESET = "your_unsigned_preset";
 // ───────────────────────────────────────────────────────────────────────────────
 
 type Step = "personal" | "family" | "football" | "media" | "done";
@@ -159,9 +159,20 @@ const PhotoUpload = ({ photoUrl, onUploaded, error }: PhotoUploadProps) => {
   const [uploadError, setUploadError] = useState("");
   const [preview, setPreview] = useState<string>("");
 
+  const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+
   const handleFile = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Validate file size before doing anything else
+    if (file.size > MAX_FILE_SIZE) {
+      setUploadError(
+        `Image is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Max allowed is 2MB.`
+      );
+      e.target.value = ""; // reset the input so the same file can be reselected after compressing
+      return;
+    }
 
     // Local preview
     const reader = new FileReader();
@@ -235,7 +246,7 @@ const PhotoUpload = ({ photoUrl, onUploaded, error }: PhotoUploadProps) => {
             <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-2xl">📸</div>
             <div>
               <p className="text-white/70 text-sm font-medium">Click to upload your photo</p>
-              <p className="text-white/30 text-xs mt-1">JPG, PNG or WEBP · Max 10MB · Full-body, clear background preferred</p>
+              <p className="text-white/30 text-xs mt-1">JPG, PNG or WEBP · Max 2MB · Full-body, clear background preferred</p>
             </div>
           </div>
         )}
@@ -411,10 +422,11 @@ export default function FootballAcademyRegistration() {
     };
 
     try {
+      const form = new FormData();
+      form.append("data", JSON.stringify(payload));
       await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify(payload),
+        body: form,
         mode: "no-cors",
       });
     } catch {
