@@ -162,6 +162,11 @@ const PhotoUpload = ({ photoUrl, onUploaded, error }: PhotoUploadProps) => {
   const handleFile = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // file size should not be more than 2MB
+    if (file.size > 2 * 1024 * 1024) {
+      setUploadError("File size exceeds 2MB. Please choose a smaller file.");
+      return;
+    }
 
     // Local preview
     const reader = new FileReader();
@@ -235,7 +240,7 @@ const PhotoUpload = ({ photoUrl, onUploaded, error }: PhotoUploadProps) => {
             <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-2xl">📸</div>
             <div>
               <p className="text-white/70 text-sm font-medium">Click to upload your photo</p>
-              <p className="text-white/30 text-xs mt-1">JPG, PNG or WEBP · Max 10MB · Full-body, clear background preferred</p>
+              <p className="text-white/30 text-xs mt-1">JPG, PNG or WEBP · Max 2MB · Full-body, clear background preferred</p>
             </div>
           </div>
         )}
@@ -358,6 +363,10 @@ export default function FootballAcademyRegistration() {
 
     if (step === "media") {
       if (!form.photoUrl) e.photoUrl = "Please upload a photo of yourself";
+      if(!form.videoLink.trim()) e.videoLink = "Please provide a video link";
+      if (form.videoLink && !/^https?:\/\/.+/.test(form.videoLink)) {
+        e.videoLink = "Please enter a valid URL";
+      }
     }
 
     setErrors(e);
@@ -762,6 +771,7 @@ export default function FootballAcademyRegistration() {
                     value={form.videoLink}
                     onChange={set("videoLink")}
                   />
+                  <FieldError msg={errors.videoLink} />
                 </div>
 
                 <NavButtons
