@@ -159,18 +159,12 @@ const PhotoUpload = ({ photoUrl, onUploaded, error }: PhotoUploadProps) => {
   const [uploadError, setUploadError] = useState("");
   const [preview, setPreview] = useState<string>("");
 
-  const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-
   const handleFile = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Validate file size before doing anything else
-    if (file.size > MAX_FILE_SIZE) {
-      setUploadError(
-        `Image is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Max allowed is 2MB.`
-      );
-      e.target.value = ""; // reset the input so the same file can be reselected after compressing
+    // file size should not be more than 2MB
+    if (file.size > 2 * 1024 * 1024) {
+      setUploadError("File size exceeds 2MB. Please choose a smaller file.");
       return;
     }
 
@@ -246,7 +240,7 @@ const PhotoUpload = ({ photoUrl, onUploaded, error }: PhotoUploadProps) => {
             <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-2xl">📸</div>
             <div>
               <p className="text-white/70 text-sm font-medium">Click to upload your photo</p>
-              <p className="text-white/30 text-xs mt-1">JPG, JPEG, PNG or WEBP · Max 2MB · Full-body, clear background preferred</p>
+              <p className="text-white/30 text-xs mt-1">JPG, PNG or WEBP · Max 2MB · Full-body, clear background preferred</p>
             </div>
           </div>
         )}
@@ -369,6 +363,10 @@ export default function FootballAcademyRegistration() {
 
     if (step === "media") {
       if (!form.photoUrl) e.photoUrl = "Please upload a photo of yourself";
+      if(!form.videoLink.trim()) e.videoLink = "Please provide a video link";
+      if (form.videoLink && !/^https?:\/\/.+/.test(form.videoLink)) {
+        e.videoLink = "Please enter a valid URL";
+      }
     }
 
     setErrors(e);
@@ -422,11 +420,10 @@ export default function FootballAcademyRegistration() {
     };
 
     try {
-      const form = new FormData();
-      form.append("data", JSON.stringify(payload));
       await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
-        body: form,
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload),
         mode: "no-cors",
       });
     } catch {
@@ -774,6 +771,7 @@ export default function FootballAcademyRegistration() {
                     value={form.videoLink}
                     onChange={set("videoLink")}
                   />
+                  <FieldError msg={errors.videoLink} />
                 </div>
 
                 <NavButtons
