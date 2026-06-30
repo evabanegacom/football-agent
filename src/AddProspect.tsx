@@ -6,8 +6,8 @@ const GOOGLE_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbzDJsDhzek_eDWzhIrdjCyBXQpO6nnd4Na2j6m3lAEGWM4-v5s6xcdNpzeCSCLxAkgA/exec";
 
 // Replace with your Cloudinary cloud name + an UNSIGNED upload preset
-const CLOUDINARY_CLOUD_NAME = "your_cloud_name";
-const CLOUDINARY_UPLOAD_PRESET = "your_unsigned_preset";
+const CLOUDINARY_CLOUD_NAME = "spetsnaz";
+const CLOUDINARY_UPLOAD_PRESET = "football-registration";
 // ───────────────────────────────────────────────────────────────────────────────
 
 type Step = "personal" | "family" | "football" | "media" | "done";
